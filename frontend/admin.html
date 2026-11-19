@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin - LUMIÉ</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="faixa-topo">✨ FRETE GRÁTIS para compras acima de R$199</div>
+    <nav class="navbar" id="navbar"></nav>
+
+    <main class="container">
+        <h2>Painel administrativo</h2>
+        <div id="mensagem"></div>
+
+        <div class="abas">
+            <button class="ativa" data-aba="abaProdutos">Cadastro de Produtos</button>
+            <button data-aba="abaEstoque">Movimentação de Estoque</button>
+            <button data-aba="abaPedidos">Movimentação de Vendas</button>
+            <button data-aba="abaProfissionais">Profissionais</button>
+            <button data-aba="abaServicos">Serviços</button>
+            <button data-aba="abaAgendamentos">Agendamentos</button>
+            <button data-aba="abaRelatorios">Relatórios</button>
+        </div>
+
+        <!-- ABA: PRODUTOS -->
+        <section id="abaProdutos" class="painel-secao ativa">
+            <form id="formProduto" class="form-card" style="margin:0 0 20px;">
+                <h3 id="tituloFormProduto">Novo produto</h3>
+                <input type="hidden" id="produtoId">
+                <div class="linha-campos">
+                    <div class="campo">
+                        <label for="produtoNome">Nome</label>
+                        <input type="text" id="produtoNome" required>
+                    </div>
+                    <div class="campo">
+                        <label for="produtoCategoria">Categoria</label>
+                        <select id="produtoCategoria" required></select>
+                    </div>
+                </div>
+                <div class="campo">
+                    <label for="produtoDescricao">Descrição</label>
+                    <input type="text" id="produtoDescricao">
+                </div>
+                <div class="linha-campos">
+                    <div class="campo">
+                        <label for="produtoPreco">Preço (R$)</label>
+                        <input type="number" step="0.01" id="produtoPreco" required>
+                    </div>
+                    <div class="campo">
+                        <label for="produtoImagem">URL da imagem (opcional)</label>
+                        <input type="text" id="produtoImagem">
+                    </div>
+                    <div class="campo" id="campoEstoqueInicial">
+                        <label for="produtoEstoqueInicial">Estoque inicial</label>
+                        <input type="number" id="produtoEstoqueInicial" value="0">
+                    </div>
+                </div>
+                <div class="campo">
+                    <label for="produtoImagemArquivo">Ou envie uma imagem do computador (JPG, PNG, WEBP ou GIF, até 5 MB)</label>
+                    <input type="file" id="produtoImagemArquivo" accept="image/png,image/jpeg,image/webp,image/gif">
+                    <img id="previewImagemProduto" alt="Pré-visualização" style="display:none; max-width:140px; max-height:140px; margin-top:8px; border-radius:8px; object-fit:cover;">
+                </div>
+                <button type="submit" class="btn btn-primario">Salvar produto</button>
+                <button type="button" id="btnCancelarEdicao" class="btn btn-secundario" style="display:none;">Cancelar edição</button>
+            </form>
+
+            <div class="tabela-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Cód.</th><th>Nome</th><th>Categoria</th><th>Preço</th><th>Estoque</th><th>Ações</th></tr>
+                    </thead>
+                    <tbody id="corpoTabelaProdutos"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ABA: ESTOQUE -->
+        <section id="abaEstoque" class="painel-secao">
+            <form id="formEstoque" class="form-card" style="margin:0 0 20px;">
+                <h3>Movimentar estoque</h3>
+                <div class="campo">
+                    <label for="estoqueProduto">Produto</label>
+                    <select id="estoqueProduto" required></select>
+                </div>
+                <div class="linha-campos">
+                    <div class="campo">
+                        <label for="estoqueTipo">Tipo de movimento</label>
+                        <select id="estoqueTipo">
+                            <option value="ENTRADA">Entrada</option>
+                            <option value="SAIDA">Saída</option>
+                        </select>
+                    </div>
+                    <div class="campo">
+                        <label for="estoqueQuantidade">Quantidade</label>
+                        <input type="number" id="estoqueQuantidade" min="1" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primario">Registrar movimentação</button>
+            </form>
+
+            <div class="tabela-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Produto</th><th>Qtd. atual</th><th>Qtd. mínima</th></tr>
+                    </thead>
+                    <tbody id="corpoTabelaEstoque"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ABA: PEDIDOS -->
+        <section id="abaPedidos" class="painel-secao">
+            <div class="tabela-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Cód.</th><th>Cliente</th><th>Data</th><th>Total</th><th>Status</th><th>Entrega</th><th>Ações</th></tr>
+                    </thead>
+                    <tbody id="corpoTabelaPedidos"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ABA: PROFISSIONAIS -->
+        <section id="abaProfissionais" class="painel-secao">
+            <form id="formProfissional" class="form-card" style="margin:0 0 20px; max-width:100%;">
+                <h3 id="tituloFormProfissional">Novo profissional</h3>
+                <input type="hidden" id="profissionalId">
+                <div class="linha-campos">
+                    <div class="campo">
+                        <label for="profissionalNome">Nome</label>
+                        <input type="text" id="profissionalNome" required>
+                    </div>
+                    <div class="campo">
+                        <label for="profissionalEspecialidade">Especialidade</label>
+                        <input type="text" id="profissionalEspecialidade" placeholder="Ex: Maquiadora" required>
+                    </div>
+                    <div class="campo">
+                        <label for="profissionalPrecoBase">Preço base (R$)</label>
+                        <input type="number" step="0.01" id="profissionalPrecoBase" required>
+                    </div>
+                </div>
+                <div class="linha-campos">
+                    <div class="campo">
+                        <label for="profissionalBio">Bio</label>
+                        <input type="text" id="profissionalBio">
+                    </div>
+                    <div class="campo">
+                        <label for="profissionalFoto">URL da foto</label>
+                        <input type="text" id="profissionalFoto">
+                    </div>
+                </div>
+
+                <p><strong>Endereço de atendimento</strong> (digite o CEP para autocompletar)</p>
+                <div class="linha-campos">
+                    <div class="campo">
+                        <label for="profissionalCep">CEP</label>
+                        <input type="text" id="profissionalCep" required>
+                    </div>
+                    <div class="campo">
+                        <label for="profissionalNumero">Número</label>
+                        <input type="text" id="profissionalNumero" required>
+                    </div>
+                </div>
+                <div class="campo">
+                    <label for="profissionalLogradouro">Rua</label>
+                    <input type="text" id="profissionalLogradouro" required>
+                </div>
+                <div class="linha-campos">
+                    <div class="campo">
+                        <label for="profissionalBairro">Bairro</label>
+                        <input type="text" id="profissionalBairro" required>
+                    </div>
+                    <div class="campo">
+                        <label for="profissionalLocalidade">Cidade</label>
+                        <input type="text" id="profissionalLocalidade" required>
+                    </div>
+                    <div class="campo">
+                        <label for="profissionalUf">UF</label>
+                        <input type="text" id="profissionalUf" maxlength="2" required>
+                    </div>
+                </div>
+                <div class="linha-campos">
+                    <div class="campo">
+                        <label for="profissionalLatitude">Latitude (opcional, pro mapa)</label>
+                        <input type="number" step="0.000001" id="profissionalLatitude" placeholder="Ex: -23.5613">
+                    </div>
+                    <div class="campo">
+                        <label for="profissionalLongitude">Longitude (opcional, pro mapa)</label>
+                        <input type="number" step="0.000001" id="profissionalLongitude" placeholder="Ex: -46.6565">
+                    </div>
+                </div>
+                <small style="color:var(--texto-claro); display:block; margin-top:-8px; margin-bottom:12px;">
+                    💡 Dica: clique com o botão direito no local no Google Maps e copie as coordenadas que aparecem.
+                    Sem isso, o profissional só aparece na lista, não no mapa.
+                </small>
+
+                <button type="submit" class="btn btn-primario">Salvar profissional</button>
+                <button type="button" id="btnCancelarEdicaoProfissional" class="btn btn-secundario" style="display:none;">Cancelar edição</button>
+            </form>
+
+            <div class="tabela-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Cód.</th><th>Nome</th><th>Especialidade</th><th>Cidade</th><th>Preço base</th><th>Avaliação</th><th>Ações</th></tr>
+                    </thead>
+                    <tbody id="corpoTabelaProfissionais"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ABA: SERVIÇOS -->
+        <section id="abaServicos" class="painel-secao">
+            <form id="formServico" class="form-card" style="margin:0 0 20px;">
+                <h3 id="tituloFormServico">Novo serviço</h3>
+                <input type="hidden" id="servicoId">
+                <div class="campo">
+                    <label for="servicoProfissional">Profissional</label>
+                    <select id="servicoProfissional" required></select>
+                </div>
+                <div class="campo">
+                    <label for="servicoNome">Nome do serviço</label>
+                    <input type="text" id="servicoNome" required>
+                </div>
+                <div class="campo">
+                    <label for="servicoDescricao">Descrição</label>
+                    <input type="text" id="servicoDescricao">
+                </div>
+                <div class="linha-campos">
+                    <div class="campo">
+                        <label for="servicoPreco">Preço (R$)</label>
+                        <input type="number" step="0.01" id="servicoPreco" required>
+                    </div>
+                    <div class="campo">
+                        <label for="servicoDuracao">Duração (min)</label>
+                        <input type="number" id="servicoDuracao" value="60" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primario">Salvar serviço</button>
+                <button type="button" id="btnCancelarEdicaoServico" class="btn btn-secundario" style="display:none;">Cancelar edição</button>
+            </form>
+
+            <div class="tabela-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Cód.</th><th>Serviço</th><th>Profissional</th><th>Preço</th><th>Duração</th><th>Ações</th></tr>
+                    </thead>
+                    <tbody id="corpoTabelaServicos"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ABA: AGENDAMENTOS -->
+        <section id="abaAgendamentos" class="painel-secao">
+            <div class="tabela-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Cód.</th><th>Cliente</th><th>Serviço</th><th>Profissional</th><th>Data/Hora</th><th>Status</th></tr>
+                    </thead>
+                    <tbody id="corpoTabelaAgendamentos"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ABA: RELATÓRIOS -->
+        <section id="abaRelatorios" class="painel-secao">
+            <div class="graficos-grid">
+                <div class="grafico-card">
+                    <h3>Vendas por categoria (R$)</h3>
+                    <canvas id="graficoVendas"></canvas>
+                </div>
+                <div class="grafico-card">
+                    <h3>Situação do estoque</h3>
+                    <canvas id="graficoEstoque"></canvas>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/carrinho.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/cep.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>

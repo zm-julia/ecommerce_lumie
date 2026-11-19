@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professionals - LUMIÉ</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+</head>
+<body>
+    <div class="faixa-topo">✨ FRETE GRÁTIS para compras acima de R$199</div>
+    <nav class="navbar" id="navbar"></nav>
+
+    <section class="hero" style="padding:36px 16px;">
+        <div class="container" style="display:block;">
+            <h1 style="font-size:1.8rem; margin:0 0 6px;">Encontre profissionais perto de você</h1>
+            <p style="color:var(--texto-claro); max-width:520px; margin:0;">
+                Busque por especialidade e veja a avaliação de quem já passou por lá.
+            </p>
+        </div>
+    </section>
+
+    <div class="container">
+        <div class="filtros">
+            <input type="text" id="inputBuscaProfissional" placeholder="Buscar por nome ou especialidade...">
+            <select id="selectEspecialidade">
+                <option value="">Todas as especialidades</option>
+            </select>
+            <button id="btnAlternarMapa" class="btn btn-secundario">🗺️ Ver no mapa</button>
+        </div>
+
+        <div id="mapaProfissionais" style="display:none; height:420px; border-radius:10px; overflow:hidden; box-shadow:var(--sombra); margin-bottom:20px;"></div>
+
+        <div id="gridProfissionais" class="grid-profissionais">
+            <p class="vazio">Carregando profissionais...</p>
+        </div>
+    </div>
+
+    <footer>
+        <div class="rodape-fim">&copy; 2026 LUMIÉ Beauty &amp; Professionals. Todos os direitos reservados.</div>
+    </footer>
+
+    <script src="js/carrinho.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/profissionais.js"></script>
+</body>
+</html>

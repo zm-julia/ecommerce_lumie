@@ -1,0 +1,687 @@
+### ============================================================================
+### LUMIÉ - Beauty & Professionals
+### Arquivo de testes de integração (extensão REST Client - VS Code)
+### ============================================================================
+### COMO USAR
+### 1) Suba o servidor (npm start) e rode `npm run sync` + `npm run seed` antes
+###    (o seed cria as categorias, os produtos, os profissionais e o admin).
+### 2) Execute as requisições DE CIMA PARA BAIXO (clique em "Send Request").
+###    Os tokens JWT e os ids criados são capturados automaticamente das
+###    respostas (request variables), não precisa copiar e colar nada.
+### 3) Para repetir a bateria inteira, rode `npm run sync` e `npm run seed` de
+###    novo (o cadastro do cliente de teste devolve 409 se já existir).
+### ============================================================================
+
+@baseUrl = http://localhost:3000
+@tokenAdmin = {{loginAdmin.response.body.token}}
+@tokenCliente = {{loginCliente.response.body.token}}
+
+
+### ============================================================================
+### 1. ROTAS PÚBLICAS (sem login)
+### ============================================================================
+
+### Teste rápido da API
+GET {{baseUrl}}/api
+
+### Login do administrador de teste (criado pelo seed.js) - gera o token do ADMIN
+# @name loginAdmin
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "email": "admin@lumie.com",
+  "senha": "admin123"
+}
+
+### Cadastro de novo cliente (CPF válido + endereço)
+# @name cadastroCliente
+POST {{baseUrl}}/usuarios
+Content-Type: application/json
+
+{
+  "nome": "Maria Cliente",
+  "email": "maria@teste.com",
+  "senha": "123456",
+  "telefone": "11999998888",
+  "cpf": "11144477735",
+  "cep": "01310-100",
+  "logradouro": "Avenida Paulista",
+  "bairro": "Bela Vista",
+  "localidade": "São Paulo",
+  "uf": "SP",
+  "numero": "900"
+}
+
+### Login do cliente - gera o token do CLIENTE
+# @name loginCliente
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "email": "maria@teste.com",
+  "senha": "123456"
+}
+
+### Consulta de CEP via ViaCEP (proxy do backend)
+GET {{baseUrl}}/cep/01310100
+
+### ---- Produtos (públicos) ----
+
+### Listagem geral de produtos
+GET {{baseUrl}}/produtos
+
+### Consulta de produto por código
+GET {{baseUrl}}/produtos/1
+
+### Busca de produto por nome
+GET {{baseUrl}}/produtos/buscar?nome=batom
+
+### ---- Categorias (públicas) ----
+
+### Listagem de categorias
+GET {{baseUrl}}/categorias
+
+### Consulta de categoria por código
+GET {{baseUrl}}/categorias/1
+
+### ---- Profissionais, serviços e avaliações (públicos) ----
+
+### Listagem de profissionais
+GET {{baseUrl}}/profissionais
+
+### Consulta de profissional por código (com localização, serviços e avaliações)
+GET {{baseUrl}}/profissionais/1
+
+### Listagem de serviços
+GET {{baseUrl}}/servicos
+
+### Listagem de serviços filtrando por profissional
+GET {{baseUrl}}/servicos?idProfissional=1
+
+### Consulta de serviço por código
+GET {{baseUrl}}/servicos/1
+
+### Listagem de avaliações (de um profissional)
+GET {{baseUrl}}/avaliacoes?idProfissional=1
+
+
+### ============================================================================
+### 2. ROTAS PRIVADAS - CLIENTE (precisam do token do cliente)
+### ============================================================================
+
+### ---- Perfil / dados cadastrais ----
+
+### Perfil do usuário logado
+GET {{baseUrl}}/usuarios/perfil
+Authorization: Bearer {{tokenCliente}}
+
+### Atualização COMPLETA (PUT) do próprio cadastro
+PUT {{baseUrl}}/usuarios/{{cadastroCliente.response.body.codUsuario}}
+Authorization: Bearer {{tokenCliente}}
+Content-Type: application/json
+
+{
+  "nome": "Maria Cliente Silva",
+  "email": "maria@teste.com",
+  "telefone": "11999998888",
+  "cpf": "11144477735",
+  "cep": "01310-100",
+  "logradouro": "Avenida Paulista",
+  "bairro": "Bela Vista",
+  "localidade": "São Paulo",
+  "uf": "SP",
+  "numero": "900"
+}
+
+### Atualização PARCIAL (PATCH) do próprio cadastro - só telefone e complemento
+PATCH {{baseUrl}}/usuarios/{{cadastroCliente.response.body.codUsuario}}
+Authorization: Bearer {{tokenCliente}}
+Content-Type: application/json
+
+{
+  "telefone": "11988887777",
+  "complemento": "Apto 52"
+}
+
+### ---- Pedidos (checkout) ----
+
+### Finalização de pedido (checkout) - cria itens + entrega e deduz o estoque
+# @name pedido
+POST {{baseUrl}}/pedidos
+Authorization: Bearer {{tokenCliente}}
+Content-Type: application/json
+
+{
+  "itens": [
+    { "idProduto": 1, "quantidade": 2 },
+    { "idProduto": 5, "quantidade": 1 }
+  ]
+}
+
+### Histórico de pedidos do cliente logado (com status da entrega)
+GET {{baseUrl}}/pedidos/meus-pedidos
+Authorization: Bearer {{tokenCliente}}
+
+### Consulta de um pedido por código
+GET {{baseUrl}}/pedidos/{{pedido.response.body.codPedido}}
+Authorization: Bearer {{tokenCliente}}
+
+### ---- Agendamentos e avaliações ----
+
+### Cliente agenda um serviço (fica SOLICITADO)
+# @name agendamento
+POST {{baseUrl}}/agendamentos
+Authorization: Bearer {{tokenCliente}}
+Content-Type: application/json
+
+{
+  "idServico": 1,
+  "dataHora": "2026-12-20T14:00:00",
+  "observacoes": "Maquiagem para formatura"
+}
+
+### Cliente agenda um segundo horário (será cancelado em seguida)
+# @name agendamentoCancelar
+POST {{baseUrl}}/agendamentos
+Authorization: Bearer {{tokenCliente}}
+Content-Type: application/json
+
+{
+  "idServico": 2,
+  "dataHora": "2026-12-21T10:00:00"
+}
+
+### Cliente cancela o próprio agendamento
+PATCH {{baseUrl}}/agendamentos/{{agendamentoCancelar.response.body.codAgendamento}}
+Authorization: Bearer {{tokenCliente}}
+Content-Type: application/json
+
+{
+  "status": "CANCELADO"
+}
+
+### Histórico de agendamentos do cliente logado
+GET {{baseUrl}}/agendamentos/meus-agendamentos
+Authorization: Bearer {{tokenCliente}}
+
+
+### ============================================================================
+### 3. ROTAS PRIVADAS - APENAS ADMIN (precisam do token do admin)
+### ============================================================================
+
+### ---- Usuários ----
+
+### Listagem de todos os usuários
+GET {{baseUrl}}/usuarios
+Authorization: Bearer {{tokenAdmin}}
+
+### Cadastro de um cliente descartável (para testar o DELETE de usuário)
+# @name clienteDescartavel
+POST {{baseUrl}}/usuarios
+Content-Type: application/json
+
+{
+  "nome": "Cliente Descartável",
+  "email": "descartavel@teste.com",
+  "senha": "123456",
+  "telefone": "11977776666",
+  "cpf": "39053344705",
+  "cep": "01310-100",
+  "logradouro": "Avenida Paulista",
+  "bairro": "Bela Vista",
+  "localidade": "São Paulo",
+  "uf": "SP",
+  "numero": "1000"
+}
+
+### Remoção do usuário descartável
+DELETE {{baseUrl}}/usuarios/{{clienteDescartavel.response.body.codUsuario}}
+Authorization: Bearer {{tokenAdmin}}
+
+### ---- Categorias (CRUD completo) ----
+
+### Cadastro de categoria
+# @name novaCategoria
+POST {{baseUrl}}/categorias
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "nome": "Perfumaria",
+  "descricao": "Perfumes e body splashes"
+}
+
+### Atualização completa (PUT) de categoria
+PUT {{baseUrl}}/categorias/{{novaCategoria.response.body.codCategoria}}
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "nome": "Perfumaria e Fragrâncias",
+  "descricao": "Perfumes, body splashes e águas perfumadas"
+}
+
+### Atualização parcial (PATCH) de categoria
+PATCH {{baseUrl}}/categorias/{{novaCategoria.response.body.codCategoria}}
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "descricao": "Fragrâncias para todos os momentos"
+}
+
+### Remoção de categoria (só funciona se não houver produtos vinculados)
+DELETE {{baseUrl}}/categorias/{{novaCategoria.response.body.codCategoria}}
+Authorization: Bearer {{tokenAdmin}}
+
+### ---- Produtos (CRUD completo) ----
+
+### Cadastro de novo produto (cria também o registro de estoque)
+# @name novoProduto
+POST {{baseUrl}}/produtos
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "idCategoria": 1,
+  "nome": "Gloss Labial Cristal",
+  "descricao": "Brilho intenso e hidratação",
+  "preco": 39.90,
+  "imagem_url": "",
+  "quantidade_atual": 20,
+  "quantidade_minima": 5
+}
+
+### Upload de imagem do produto (troque ./imagem-teste.png por uma imagem sua,
+### o caminho é relativo a este arquivo). Devolve o "imagem_url" gerado.
+# @name uploadImagem
+POST {{baseUrl}}/produtos/upload
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: multipart/form-data; boundary=----LumieBoundary
+
+------LumieBoundary
+Content-Disposition: form-data; name="imagem"; filename="imagem-teste.jpg"
+Content-Type: image/jpg
+
+< ./imagem-teste.jpg
+------LumieBoundary--
+
+### Atualização completa (PUT) de produto
+PUT {{baseUrl}}/produtos/{{novoProduto.response.body.codProduto}}
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "idCategoria": 1,
+  "nome": "Gloss Labial Cristal 8ml",
+  "descricao": "Brilho intenso, hidratação e acabamento espelhado",
+  "preco": 42.90,
+  "imagem_url": "{{uploadImagem.response.body.imagem_url}}",
+  "ativo": true
+}
+
+### Atualização parcial (PATCH) de produto - só o preço
+PATCH {{baseUrl}}/produtos/{{novoProduto.response.body.codProduto}}
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "preco": 37.90
+}
+
+### ---- Estoque ----
+
+### Listagem do estoque
+GET {{baseUrl}}/estoque
+Authorization: Bearer {{tokenAdmin}}
+
+### Consulta de um registro de estoque
+GET {{baseUrl}}/estoque/1
+Authorization: Bearer {{tokenAdmin}}
+
+### Movimentação de estoque - ENTRADA
+POST {{baseUrl}}/estoque
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "idProduto": 4,
+  "quantidade": 30,
+  "tipoMovimento": "ENTRADA"
+}
+
+### Movimentação de estoque - SAÍDA
+POST {{baseUrl}}/estoque
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "idProduto": 4,
+  "quantidade": 5,
+  "tipoMovimento": "SAIDA"
+}
+
+### Atualização completa (PUT) do registro de estoque do produto novo
+PUT {{baseUrl}}/estoque/{{novoProduto.response.body.estoqueProduto.codEstoque}}
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "quantidade_atual": 50,
+  "quantidade_minima": 10
+}
+
+### Remoção do produto de teste (o estoque dele é removido junto)
+DELETE {{baseUrl}}/produtos/{{novoProduto.response.body.codProduto}}
+Authorization: Bearer {{tokenAdmin}}
+
+### ---- Pedidos (gestão) ----
+
+### Listagem geral de pedidos
+GET {{baseUrl}}/pedidos
+Authorization: Bearer {{tokenAdmin}}
+
+### Atualização do status do pedido e da entrega
+PATCH {{baseUrl}}/pedidos/{{pedido.response.body.codPedido}}
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "status": "ENVIADO",
+  "statusEntrega": "SAIU_PARA_ENTREGA",
+  "codigoRastreio": "LUM123456789BR"
+}
+
+### ---- Profissionais (CRUD completo) ----
+
+### Cadastro de profissional (já cria a localização junto)
+# @name novoProfissional
+POST {{baseUrl}}/profissionais
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "nome": "Renata Alves",
+  "especialidade": "Designer de Sobrancelhas",
+  "bio": "10 anos de experiência em design e henna",
+  "foto_url": "",
+  "preco_base": 90,
+  "cep": "01310-100",
+  "logradouro": "Avenida Paulista",
+  "bairro": "Bela Vista",
+  "localidade": "São Paulo",
+  "uf": "SP",
+  "numero": "1578",
+  "latitude": -23.5614,
+  "longitude": -46.6559
+}
+
+### Atualização completa (PUT) de profissional
+PUT {{baseUrl}}/profissionais/{{novoProfissional.response.body.codProfissional}}
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "nome": "Renata Alves",
+  "especialidade": "Designer de Sobrancelhas e Cílios",
+  "bio": "10 anos de experiência em design, henna e extensão de cílios",
+  "preco_base": 110,
+  "ativo": true
+}
+
+### Atualização parcial (PATCH) de profissional - só o preço base
+PATCH {{baseUrl}}/profissionais/{{novoProfissional.response.body.codProfissional}}
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "preco_base": 120
+}
+
+### ---- Serviços (CRUD completo) ----
+
+### Cadastro de serviço para o profissional criado acima
+# @name novoServico
+POST {{baseUrl}}/servicos
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "idProfissional": {{novoProfissional.response.body.codProfissional}},
+  "nome": "Design de sobrancelhas com henna",
+  "descricao": "Modelagem e preenchimento com henna",
+  "preco": 90,
+  "duracao_minutos": 45
+}
+
+### Atualização completa (PUT) de serviço
+PUT {{baseUrl}}/servicos/{{novoServico.response.body.codServico}}
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "nome": "Design de sobrancelhas com henna",
+  "descricao": "Modelagem, preenchimento com henna e finalização",
+  "preco": 100,
+  "duracao_minutos": 60
+}
+
+### Atualização parcial (PATCH) de serviço - só o preço
+PATCH {{baseUrl}}/servicos/{{novoServico.response.body.codServico}}
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "preco": 95
+}
+
+### Remoção do serviço de teste
+DELETE {{baseUrl}}/servicos/{{novoServico.response.body.codServico}}
+Authorization: Bearer {{tokenAdmin}}
+
+### Remoção do profissional de teste
+DELETE {{baseUrl}}/profissionais/{{novoProfissional.response.body.codProfissional}}
+Authorization: Bearer {{tokenAdmin}}
+
+### ---- Agendamentos (gestão) e avaliação ----
+
+### Listagem geral de agendamentos
+GET {{baseUrl}}/agendamentos
+Authorization: Bearer {{tokenAdmin}}
+
+### Admin confirma o agendamento do cliente
+PATCH {{baseUrl}}/agendamentos/{{agendamento.response.body.codAgendamento}}
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "status": "CONFIRMADO"
+}
+
+### Admin conclui o agendamento (só agendamento CONCLUIDO pode ser avaliado)
+PATCH {{baseUrl}}/agendamentos/{{agendamento.response.body.codAgendamento}}
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "status": "CONCLUIDO"
+}
+
+### Cliente avalia o atendimento concluído (nota de 1 a 5)
+POST {{baseUrl}}/avaliacoes
+Authorization: Bearer {{tokenCliente}}
+Content-Type: application/json
+
+{
+  "idAgendamento": {{agendamento.response.body.codAgendamento}},
+  "nota": 5,
+  "comentario": "Atendimento excelente, super recomendo!"
+}
+
+### ---- Relatórios (alimentam os gráficos do painel admin) ----
+
+### Relatório: vendas por categoria
+GET {{baseUrl}}/relatorios/vendas
+Authorization: Bearer {{tokenAdmin}}
+
+### Relatório: situação do estoque
+GET {{baseUrl}}/relatorios/estoque
+Authorization: Bearer {{tokenAdmin}}
+
+
+### ============================================================================
+### 4. TESTES DE ERRO (respostas esperadas entre parênteses)
+### ============================================================================
+
+### Rota protegida SEM token (401)
+GET {{baseUrl}}/usuarios/perfil
+
+### Rota protegida com token INVÁLIDO (401)
+GET {{baseUrl}}/usuarios/perfil
+Authorization: Bearer token.invalido.123
+
+### Token mal formatado, sem "Bearer" (401)
+GET {{baseUrl}}/usuarios/perfil
+Authorization: {{tokenCliente}}
+
+### Login com senha errada (401)
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "email": "admin@lumie.com",
+  "senha": "senha_errada"
+}
+
+### Cadastro com CPF inválido (400)
+POST {{baseUrl}}/usuarios
+Content-Type: application/json
+
+{
+  "nome": "CPF Invalido",
+  "email": "cpfinvalido@teste.com",
+  "senha": "123456",
+  "telefone": "11999998888",
+  "cpf": "11111111111",
+  "cep": "01310-100",
+  "logradouro": "Avenida Paulista",
+  "bairro": "Bela Vista",
+  "localidade": "São Paulo",
+  "uf": "SP",
+  "numero": "900"
+}
+
+### Cadastro com e-mail/CPF já existentes (409)
+POST {{baseUrl}}/usuarios
+Content-Type: application/json
+
+{
+  "nome": "Maria Repetida",
+  "email": "maria@teste.com",
+  "senha": "123456",
+  "telefone": "11999998888",
+  "cpf": "11144477735",
+  "cep": "01310-100",
+  "logradouro": "Avenida Paulista",
+  "bairro": "Bela Vista",
+  "localidade": "São Paulo",
+  "uf": "SP",
+  "numero": "900"
+}
+
+### Cadastro sem endereço (400)
+POST {{baseUrl}}/usuarios
+Content-Type: application/json
+
+{
+  "nome": "Sem Endereco",
+  "email": "semendereco@teste.com",
+  "senha": "123456",
+  "telefone": "11999998888",
+  "cpf": "39053344705"
+}
+
+### CEP inexistente (404)
+GET {{baseUrl}}/cep/00000000
+
+### Produto que não existe (404)
+GET {{baseUrl}}/produtos/99999
+
+### Atualizar produto que não existe (404)
+PATCH {{baseUrl}}/produtos/99999
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "preco": 10
+}
+
+### CLIENTE tentando cadastrar produto - rota só de ADMIN (403)
+POST {{baseUrl}}/produtos
+Authorization: Bearer {{tokenCliente}}
+Content-Type: application/json
+
+{
+  "idCategoria": 1,
+  "nome": "Produto Proibido",
+  "preco": 10
+}
+
+### CLIENTE tentando ver relatórios - rota só de ADMIN (403)
+GET {{baseUrl}}/relatorios/vendas
+Authorization: Bearer {{tokenCliente}}
+
+### Pedido com carrinho vazio (400)
+POST {{baseUrl}}/pedidos
+Authorization: Bearer {{tokenCliente}}
+Content-Type: application/json
+
+{
+  "itens": []
+}
+
+### Pedido com quantidade maior que o estoque disponível (400 - estoque insuficiente)
+POST {{baseUrl}}/pedidos
+Authorization: Bearer {{tokenCliente}}
+Content-Type: application/json
+
+{
+  "itens": [
+    { "idProduto": 1, "quantidade": 99999 }
+  ]
+}
+
+### Movimentação de SAÍDA maior que o estoque disponível (400)
+POST {{baseUrl}}/estoque
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "idProduto": 1,
+  "quantidade": 99999,
+  "tipoMovimento": "SAIDA"
+}
+
+### Agendar horário já reservado (409) - mesmo serviço e horário do primeiro agendamento
+POST {{baseUrl}}/agendamentos
+Authorization: Bearer {{tokenCliente}}
+Content-Type: application/json
+
+{
+  "idServico": 1,
+  "dataHora": "2026-12-20T14:00:00"
+}
+
+### Avaliação com nota fora do intervalo (400)
+POST {{baseUrl}}/avaliacoes
+Authorization: Bearer {{tokenCliente}}
+Content-Type: application/json
+
+{
+  "idAgendamento": {{agendamento.response.body.codAgendamento}},
+  "nota": 9
+}
+
+### Upload de arquivo que não é imagem seria rejeitado (400): envie um .txt no
+### campo "imagem" da requisição de upload acima para ver o erro de formato.

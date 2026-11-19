@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil do profissional - LUMIÉ</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+</head>
+<body>
+    <div class="faixa-topo">✨ FRETE GRÁTIS para compras acima de R$199</div>
+    <nav class="navbar" id="navbar"></nav>
+
+    <div class="container">
+        <div id="cabecalhoPerfil"></div>
+        <div id="mapaPerfil" style="display:none; height:260px; border-radius:10px; overflow:hidden; box-shadow:var(--sombra); margin-bottom:24px;"></div>
+
+        <div class="secao-titulo">
+            <h2>Serviços</h2>
+        </div>
+        <div id="listaServicos"></div>
+
+        <div class="secao-titulo">
+            <h2>Avaliações</h2>
+        </div>
+        <div id="listaAvaliacoes"></div>
+    </div>
+
+    <footer style="margin-top:40px;">
+        <div class="rodape-fim">&copy; 2026 LUMIÉ Beauty &amp; Professionals. Todos os direitos reservados.</div>
+    </footer>
+
+    <script src="js/carrinho.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/profissional-detalhe.js"></script>
+
+</body>
+</html>

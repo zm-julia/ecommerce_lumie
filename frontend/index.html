@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUMIÉ - Beauty &amp; Professionals</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="faixa-topo">✨ FRETE GRÁTIS para compras acima de R$199</div>
+    <nav class="navbar" id="navbar"></nav>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-texto">
+                <h1>Sua beleza,<br><em>do seu jeito.</em></h1>
+                <p>Produtos, recomendações personalizadas e os melhores profissionais de beleza perto de você.</p>
+                <div class="hero-botoes">
+                    <a href="#gridProdutos" class="btn btn-primario">Shop agora</a>
+                    <a href="beauty-match.html" class="btn btn-secundario">Fazer Beauty Match ✨</a>
+                </div>
+            </div>
+            <div class="hero-imagem">
+                <img src="https://images.unsplash.com/photo-1596704017254-9b121068fb31?w=500&q=80" alt="Modelo LUMIÉ">
+            </div>
+        </div>
+    </section>
+
+    <div class="container">
+        <div class="beneficios">
+            <div class="item-beneficio">
+                <span class="icone">🚚</span>
+                <div><strong>Frete grátis</strong><span>acima de R$199</span></div>
+            </div>
+            <div class="item-beneficio">
+                <span class="icone">✅</span>
+                <div><strong>Produtos</strong><span>100% originais</span></div>
+            </div>
+            <div class="item-beneficio">
+                <span class="icone">💳</span>
+                <div><strong>Pagamento</strong><span>seguro</span></div>
+            </div>
+            <div class="item-beneficio">
+                <span class="icone">❤️</span>
+                <div><strong>Atendimento</strong><span>especializado</span></div>
+            </div>
+        </div>
+
+        <div class="secao-titulo">
+            <h2>Compre por categoria</h2>
+            <a href="#gridProdutos">Ver todas ›</a>
+        </div>
+        <div id="gridCategorias" class="grid-categorias"></div>
+
+        <div class="secao-titulo">
+            <h2>Mais amados</h2>
+        </div>
+
+        <div class="filtros">
+            <input type="text" id="inputBusca" placeholder="Buscar produto pelo nome...">
+            <select id="selectCategoria">
+                <option value="">Todas as categorias</option>
+            </select>
+        </div>
+
+        <div id="gridProdutos" class="grid-produtos">
+            <p class="vazio">Carregando produtos...</p>
+        </div>
+    </div>
+
+    <footer>
+        <div class="faixa-destaques">
+            <div class="container">
+                <span>✨ Beleza personalizada com o Beauty Match</span>
+                <span>📍 Encontre profissionais perto de você</span>
+                <span>📅 Agende serviços com praticidade</span>
+                <span>⭐ Avalie e compartilhe suas experiências</span>
+            </div>
+        </div>
+        <div class="rodape-principal">
+            <div class="container">
+                <div>
+                    <a href="index.html" class="logo">LUMIÉ<small>BEAUTY &amp; PROFESSIONALS</small></a>
+                    <p>Conectamos você aos melhores produtos e profissionais de beleza para realçar o que há de mais único em você.</p>
+                </div>
+                <div>
+                    <h4>Institucional</h4>
+                    <ul>
+                        <li><a href="sobre.html">Sobre nós</a></li>
+                        <li><a href="#">Nossas lojas</a></li>
+                        <li><a href="#">Trabalhe conosco</a></li>
+                        <li><a href="#">Contato</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Ajuda</h4>
+                    <ul>
+                        <li><a href="#">Central de ajuda</a></li>
+                        <li><a href="#">Trocas e devoluções</a></li>
+                        <li><a href="#">Formas de pagamento</a></li>
+                        <li><a href="#">Privacidade</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Categorias</h4>
+                    <ul id="listaCategoriasRodape"></ul>
+                </div>
+                <div>
+                    <h4>Newsletter</h4>
+                    <p>Receba novidades, promoções e conteúdos exclusivos.</p>
+                    <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Obrigado por assinar!')">
+                        <input type="email" placeholder="Seu melhor e-mail" required>
+                        <button type="submit">→</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="rodape-fim">&copy; 2026 LUMIÉ Beauty &amp; Professionals. Todos os direitos reservados.</div>
+    </footer>
+
+    <script src="js/carrinho.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/produtos.js"></script>
+</body>
+</html>
