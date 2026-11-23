@@ -101,8 +101,8 @@ function alternarMapa() {
     document.getElementById('btnAlternarMapa').textContent = '📋 Ver em lista'
 
     if (!mapaLeaflet) {
-        // Centraliza em São Paulo por padrão (onde estão os profissionais do exemplo)
-        mapaLeaflet = L.map('mapaProfissionais').setView([-23.5629, -46.6708], 12)
+        // Centraliza em Santa Catarina por padrão (onde estão os profissionais do exemplo)
+        mapaLeaflet = L.map('mapaProfissionais').setView([-27.3, -48.9], 8)
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors',
@@ -138,6 +138,12 @@ function plotarMarcadores(profissionais) {
         `)
         marcadoresAtivos.push(marcador)
     })
+
+    // Ajusta o zoom do mapa para mostrar todos os marcadores (ex: depois de um filtro)
+    if (marcadoresAtivos.length > 0) {
+        const grupo = L.featureGroup(marcadoresAtivos)
+        mapaLeaflet.fitBounds(grupo.getBounds().pad(0.3), { maxZoom: 13 })
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {

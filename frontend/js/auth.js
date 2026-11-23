@@ -1,4 +1,3 @@
-
 function getUsuarioLogado() {
     const usuario = localStorage.getItem('usuario')
     return usuario ? JSON.parse(usuario) : null
@@ -26,6 +25,13 @@ function montarNavbar() {
     const logado = estaLogado()
     const usuario = getUsuarioLogado()
     const qtdCarrinho = obterCarrinho().reduce((total, item) => total + item.quantidade, 0)
+    let qtdFavoritos = 0
+    try {
+        const favoritos = JSON.parse(localStorage.getItem('favoritos'))
+        qtdFavoritos = Array.isArray(favoritos) ? favoritos.length : 0
+    } catch (err) {
+        qtdFavoritos = 0
+    }
 
     let areaConta = ''
 
@@ -56,6 +62,7 @@ function montarNavbar() {
                 <a href="sobre.html">Sobre nós</a>
             </div>
             <div class="nav-links">
+                <a href="favoritos.html">♡ Favoritos <span class="carrinho-badge">${qtdFavoritos}</span></a>
                 <a href="carrinho.html">Carrinho <span class="carrinho-badge">${qtdCarrinho}</span></a>
                 ${areaConta}
             </div>

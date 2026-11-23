@@ -58,14 +58,14 @@ async function seed() {
             nome: 'Administrador',
             email: 'admin@lumie.com',
             senha: senhaCriptografada,
-            telefone: '(11) 90000-0000',
+            telefone: '(48) 90000-0000',
             cpf: '52998224725', // CPF válido gerado só para teste
             tipo_usuario: 'ADMIN',
-            cep: '01310-100',
-            logradouro: 'Avenida Paulista',
-            bairro: 'Bela Vista',
-            localidade: 'São Paulo',
-            uf: 'SP',
+            cep: '88010-001',
+            logradouro: 'Rua Felipe Schmidt',
+            bairro: 'Centro',
+            localidade: 'Florianópolis',
+            uf: 'SC',
             numero: '1000'
         })
 
@@ -75,25 +75,25 @@ async function seed() {
             {
                 nome: 'Camila Rocha', especialidade: 'Maquiadora', preco_base: 150,
                 foto_url: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=300&q=80',
-                endereco: { cep: '01310-100', logradouro: 'Avenida Paulista', bairro: 'Bela Vista', localidade: 'São Paulo', uf: 'SP', numero: '1500', latitude: -23.5613, longitude: -46.6565 },
+                endereco: { cep: '88010-001', logradouro: 'Rua Felipe Schmidt', bairro: 'Centro', localidade: 'Florianópolis', uf: 'SC', numero: '600', latitude: -27.5956, longitude: -48.5485 },
                 servico: { nome: 'Maquiagem para eventos', preco: 150, duracao_minutos: 90 }
             },
             {
                 nome: 'Bianca Lima', especialidade: 'Cabeleireira', preco_base: 120,
                 foto_url: 'https://images.unsplash.com/photo-1595959183082-7b570b7e08e2?w=300&q=80',
-                endereco: { cep: '04538-133', logradouro: 'Avenida Brigadeiro Faria Lima', bairro: 'Itaim Bibi', localidade: 'São Paulo', uf: 'SP', numero: '2200', latitude: -23.5875, longitude: -46.6883 },
+                endereco: { cep: '88330-104', logradouro: 'Quarta Avenida', bairro: 'Centro', localidade: 'Balneário Camboriú', uf: 'SC', numero: '500', latitude: -26.9925, longitude: -48.6350 },
                 servico: { nome: 'Corte e escova', preco: 120, duracao_minutos: 60 }
             },
             {
                 nome: 'Juliana Mendes', especialidade: 'Dermatologista', preco_base: 200,
                 foto_url: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=300&q=80',
-                endereco: { cep: '05407-002', logradouro: 'Rua Oscar Freire', bairro: 'Jardins', localidade: 'São Paulo', uf: 'SP', numero: '800', latitude: -23.5629, longitude: -46.6708 },
+                endereco: { cep: '88350-380', logradouro: 'Rua do Convento', bairro: 'Centro', localidade: 'Brusque', uf: 'SC', numero: '120', latitude: -27.0983, longitude: -48.9172 },
                 servico: { nome: 'Consulta dermatológica', preco: 200, duracao_minutos: 45 }
             },
             {
                 nome: 'Lívia Castro', especialidade: 'Especialista em Penteados', preco_base: 180,
                 foto_url: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=300&q=80',
-                endereco: { cep: '01452-000', logradouro: 'Avenida Rebouças', bairro: 'Pinheiros', localidade: 'São Paulo', uf: 'SP', numero: '300', latitude: -23.5670, longitude: -46.6790 },
+                endereco: { cep: '88802-330', logradouro: 'Rua General Lauro Sodré', bairro: 'Comerciário', localidade: 'Criciúma', uf: 'SC', numero: '300', latitude: -28.6745, longitude: -49.3660 },
                 servico: { nome: 'Penteado para noivas', preco: 180, duracao_minutos: 120 }
             }
         ]

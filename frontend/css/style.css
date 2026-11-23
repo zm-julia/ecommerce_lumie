@@ -1,5 +1,3 @@
-
-
 :root {
     --vinho: #6d1b34;
     --vinho-escuro: #4a1224;
@@ -921,4 +919,8 @@ footer .rodape-fim {
     footer .rodape-principal .container {
         grid-template-columns: 1fr;
     }
+}
+
+.leaflet-container {
+    z-index: 0;
 }

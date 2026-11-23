@@ -1,4 +1,3 @@
-
 let listaProdutos = []
 
 
@@ -89,7 +88,7 @@ function renderizarProdutos(produtos) {
 
         return `
             <div class="card-produto">
-                <button class="icone-favorito" onclick="this.textContent = this.textContent === '♡' ? '❤️' : '♡'">♡</button>
+                <button class="icone-favorito" title="Favoritar" onclick="alternarFavorito(${produto.codProduto}, this)">${ehFavorito(produto.codProduto) ? '❤️' : '♡'}</button>
                 <img class="img-produto" src="${imagem}" alt="${produto.nome}">
                 <div class="info">
                     <span class="categoria-tag">${produto.categoriaProduto ? produto.categoriaProduto.nome : ''}</span>
